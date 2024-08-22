@@ -1,0 +1,388 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Assignment_1</title><meta name="generator" content="MATLAB 9.14"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2024-08-22"><meta name="DC.source" content="Assignment_1.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; }
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+span.typesection { color:#A0522D }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#1">SYSTEM SETTING</a></li><li><a href="#2">IMPLEMENTATION</a></li><li><a href="#3">FIGURE</a></li></ul></div><h2 id="1">SYSTEM SETTING</h2><pre class="codeinput"><span class="comment">% In the below code, we will try to implement a system in which the input</span>
+<span class="comment">% is an AWGN and we know the auto-correlation function of the received</span>
+<span class="comment">% in-phase and quadrature components. Based on this information we have to</span>
+<span class="comment">% now find the output function which is as follows:</span>
+<span class="comment">% $r(t) = r_I(t)\cos(2\pif_ct) - r_Q(t)\sin(2\pif_ct)$</span>
+<span class="comment">%</span>
+<span class="comment">% The auto-correlation of the channel modified input AWGNs is given as</span>
+<span class="comment">% follows:</span>
+<span class="comment">% $A_{r_I}(t, t+\tau) = \frac{P_r}{N_0} \sum_{i=0}^{N-1} \cos</span>
+<span class="comment">% \left( \frac{2\pi v\tau}{\lambda} \cos{i\Delta\theta} \right)</span>
+</pre><h2 id="2">IMPLEMENTATION</h2><pre class="codeinput">clear <span class="string">all</span>
+close <span class="string">all</span>
+clc
+
+Pr = 1;                                 <span class="comment">% total input power received at the receiver</span>
+N0 = 10;                                <span class="comment">% power of the AWGN input signal</span>
+X_f = N0 / 2;                           <span class="comment">% Fourier transform of the AWGN</span>
+v = 50;                                 <span class="comment">% velocity of the receiver</span>
+fc = 1e9;                               <span class="comment">% carrier frequency of the input signal in Hz</span>
+c = 3 * 1e8;                            <span class="comment">% speed of electromagnetic waves</span>
+angle = pi / 4;                         <span class="comment">% angle at which the receiver is receiving the transmitted signal</span>
+tau = 0:0.001:1;                        <span class="comment">% defining the time axis</span>
+f = linspace(-500, 500, length(tau));   <span class="comment">% defining the frequency axis</span>
+
+<span class="comment">% defining the input AWGN signals</span>
+x_I = randn(1, length(tau)) * sqrt(X_f);
+x_Q = randn(1, length(tau)) * sqrt(X_f);
+
+<span class="comment">% computing the Doppler shift in the frequency caused due to the mobility</span>
+<span class="comment">% of the receiver</span>
+fD = fc * v * cos(angle) / c ;
+
+<span class="comment">% we know the auto-correlation functions of the in-phase and quadrature</span>
+<span class="comment">% components in terms of the Bessel function as follows</span>
+A_rI = Pr * besselj(0, 2*pi*tau*fD);    <span class="comment">% auto-correlation function of the in-phase component</span>
+A_rQ = Pr * besselj(0, 2*pi*tau*fD);    <span class="comment">% auto-correlation fucntion of the quadrature component</span>
+
+<span class="comment">% hence, we can now find the PSD of the r_I(t) and r_Q(t) as it is</span>
+<span class="comment">% equivalent to the Fourier transform of their respective auto-correlation</span>
+<span class="comment">% functions</span>
+psd_rI = abs(fftshift(fft(A_rI)));
+psd_rQ = abs(fftshift(fft(A_rQ)));
+
+<span class="comment">% thus, we can now find the equation of the frequency response of the</span>
+<span class="comment">% respective in-phase and quadrature channels as follows</span>
+H_rI = sqrt(psd_rI) / X_f;
+H_rQ = sqrt(psd_rQ) / X_f;
+
+<span class="comment">% finding the inverse Fourier transform of the obtained frequency response</span>
+h_rI = ifft(ifftshift(H_rI));
+h_rQ = ifft(ifftshift(H_rQ));
+
+<span class="comment">% finding the actual r_I(t) and r_Q(t) now</span>
+rI = conv(x_I, h_rI);
+rQ = conv(x_Q, h_rQ);
+received_rI = rI(1:length(tau));
+received_rQ = rQ(1:length(tau));
+
+<span class="comment">% finding the net output signal</span>
+r = received_rI .* cos(2*pi*fc*tau) - received_rQ .* sin(2*pi*fc*tau);
+</pre><h2 id="3">FIGURE</h2><pre class="codeinput"><span class="comment">% plotting the input AWGN</span>
+figure
+sgtitle(<span class="string">'Input AWGN'</span>)
+subplot(2,1,1)
+plot(tau, x_I)
+xlabel(<span class="string">'Time'</span>)
+ylabel(<span class="string">'In-phase input AWGN'</span>)
+grid <span class="string">on</span>
+subplot(2,1,2)
+plot(tau, x_Q)
+xlabel(<span class="string">'Time'</span>)
+ylabel(<span class="string">'Quadrature input AWGN'</span>)
+grid <span class="string">on</span>
+
+<span class="comment">% plotting the auto-correlation functions of the received in-phase and</span>
+<span class="comment">% quadrature components</span>
+figure
+sgtitle(<span class="string">'Auto-correlation functions of received signals'</span>)
+subplot(2,1,1)
+plot(tau, A_rI)
+xlabel(<span class="string">'Time'</span>)
+ylabel(<span class="string">'Auto-correlation function of in-phase component'</span>)
+grid <span class="string">on</span>
+subplot(2,1,2)
+plot(tau, A_rQ)
+xlabel(<span class="string">'Time'</span>)
+ylabel(<span class="string">'Auto-correlation function of quadrature component'</span>)
+grid <span class="string">on</span>
+
+<span class="comment">% plotting the power spectral densities of the received in-phase and</span>
+<span class="comment">% quadrature components</span>
+figure
+sgtitle(<span class="string">'PSDs of received signals'</span>)
+subplot(2,1,1)
+plot(f, psd_rI)
+xlabel(<span class="string">'Frequency'</span>)
+ylabel(<span class="string">'PSD of in-phase component'</span>)
+grid <span class="string">on</span>
+subplot(2,1,2)
+plot(f, psd_rQ)
+xlabel(<span class="string">'Frequency'</span>)
+ylabel(<span class="string">'PSD of quadrature component'</span>)
+grid <span class="string">on</span>
+
+<span class="comment">% plotting the frequency responses of the respective channels</span>
+figure
+sgtitle(<span class="string">'Frequency response of channel'</span>)
+subplot(2,1,1)
+plot(f, H_rI);
+xlabel(<span class="string">'Frequeny'</span>)
+ylabel(<span class="string">'Frequncy response of the in-phase channel'</span>)
+grid <span class="string">on</span>
+subplot(2,1,2)
+plot(f, H_rQ)
+xlabel(<span class="string">'Frequency'</span>)
+ylabel(<span class="string">'Frequency response of the quadrature channel'</span>)
+grid <span class="string">on</span>
+
+<span class="comment">% plotting the impulse responses of the respective channels</span>
+figure
+sgtitle(<span class="string">'Impulse response of channel'</span>)
+subplot(2,1,1)
+plot(tau, h_rI)
+xlabel(<span class="string">'Time'</span>)
+ylabel(<span class="string">'Impulse response of the in-phase channel'</span>)
+grid <span class="string">on</span>
+subplot(2,1,2)
+plot(tau, h_rQ)
+xlabel(<span class="string">'Time'</span>)
+ylabel(<span class="string">'Impulse response of the quadrature component'</span>)
+grid <span class="string">on</span>
+
+<span class="comment">% plotting the net received in-phase and quadrature signals</span>
+figure
+sgtitle(<span class="string">'Received in-phase and quadrature signals'</span>)
+subplot(2,1,1)
+plot(tau, received_rI)
+xlabel(<span class="string">'Time'</span>)
+ylabel(<span class="string">'Received in-phase signal'</span>)
+grid <span class="string">on</span>
+subplot(2,1,2)
+plot(tau, received_rQ)
+xlabel(<span class="string">'Time'</span>)
+ylabel(<span class="string">'Received quadrature component'</span>)
+grid <span class="string">on</span>
+
+<span class="comment">% plotting the net received signal</span>
+figure
+sgtitle(<span class="string">'Net received signal'</span>)
+plot(tau, r)
+xlabel(<span class="string">'Time'</span>)
+ylabel(<span class="string">'Received signal'</span>)
+grid <span class="string">on</span>
+</pre><img vspace="5" hspace="5" src="Assignment_1_01.png" alt=""> <img vspace="5" hspace="5" src="Assignment_1_02.png" alt=""> <img vspace="5" hspace="5" src="Assignment_1_03.png" alt=""> <img vspace="5" hspace="5" src="Assignment_1_04.png" alt=""> <img vspace="5" hspace="5" src="Assignment_1_05.png" alt=""> <img vspace="5" hspace="5" src="Assignment_1_06.png" alt=""> <img vspace="5" hspace="5" src="Assignment_1_07.png" alt=""> <p class="footer"><br><a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2023a</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% SYSTEM SETTING
+
+% In the below code, we will try to implement a system in which the input
+% is an AWGN and we know the auto-correlation function of the received
+% in-phase and quadrature components. Based on this information we have to
+% now find the output function which is as follows:
+% $r(t) = r_I(t)\cos(2\pif_ct) - r_Q(t)\sin(2\pif_ct)$
+%
+% The auto-correlation of the channel modified input AWGNs is given as
+% follows:
+% $A_{r_I}(t, t+\tau) = \frac{P_r}{N_0} \sum_{i=0}^{N-1} \cos
+% \left( \frac{2\pi v\tau}{\lambda} \cos{i\Delta\theta} \right)
+
+
+%% IMPLEMENTATION
+
+clear all
+close all
+clc
+
+Pr = 1;                                 % total input power received at the receiver
+N0 = 10;                                % power of the AWGN input signal
+X_f = N0 / 2;                           % Fourier transform of the AWGN
+v = 50;                                 % velocity of the receiver
+fc = 1e9;                               % carrier frequency of the input signal in Hz
+c = 3 * 1e8;                            % speed of electromagnetic waves
+angle = pi / 4;                         % angle at which the receiver is receiving the transmitted signal
+tau = 0:0.001:1;                        % defining the time axis
+f = linspace(-500, 500, length(tau));   % defining the frequency axis
+
+% defining the input AWGN signals
+x_I = randn(1, length(tau)) * sqrt(X_f);
+x_Q = randn(1, length(tau)) * sqrt(X_f);
+
+% computing the Doppler shift in the frequency caused due to the mobility
+% of the receiver
+fD = fc * v * cos(angle) / c ;
+
+% we know the auto-correlation functions of the in-phase and quadrature
+% components in terms of the Bessel function as follows
+A_rI = Pr * besselj(0, 2*pi*tau*fD);    % auto-correlation function of the in-phase component
+A_rQ = Pr * besselj(0, 2*pi*tau*fD);    % auto-correlation fucntion of the quadrature component
+
+% hence, we can now find the PSD of the r_I(t) and r_Q(t) as it is
+% equivalent to the Fourier transform of their respective auto-correlation
+% functions
+psd_rI = abs(fftshift(fft(A_rI)));
+psd_rQ = abs(fftshift(fft(A_rQ)));
+
+% thus, we can now find the equation of the frequency response of the
+% respective in-phase and quadrature channels as follows
+H_rI = sqrt(psd_rI) / X_f;
+H_rQ = sqrt(psd_rQ) / X_f;
+
+% finding the inverse Fourier transform of the obtained frequency response
+h_rI = ifft(ifftshift(H_rI));
+h_rQ = ifft(ifftshift(H_rQ));
+
+% finding the actual r_I(t) and r_Q(t) now
+rI = conv(x_I, h_rI);
+rQ = conv(x_Q, h_rQ);
+received_rI = rI(1:length(tau));
+received_rQ = rQ(1:length(tau));
+
+% finding the net output signal
+r = received_rI .* cos(2*pi*fc*tau) - received_rQ .* sin(2*pi*fc*tau);
+
+%% FIGURE
+
+% plotting the input AWGN
+figure
+sgtitle('Input AWGN')
+subplot(2,1,1)
+plot(tau, x_I)
+xlabel('Time')
+ylabel('In-phase input AWGN')
+grid on
+subplot(2,1,2)
+plot(tau, x_Q)
+xlabel('Time')
+ylabel('Quadrature input AWGN')
+grid on
+
+% plotting the auto-correlation functions of the received in-phase and
+% quadrature components
+figure
+sgtitle('Auto-correlation functions of received signals')
+subplot(2,1,1)
+plot(tau, A_rI)
+xlabel('Time')
+ylabel('Auto-correlation function of in-phase component') 
+grid on
+subplot(2,1,2)
+plot(tau, A_rQ)
+xlabel('Time')
+ylabel('Auto-correlation function of quadrature component')
+grid on
+
+% plotting the power spectral densities of the received in-phase and
+% quadrature components
+figure
+sgtitle('PSDs of received signals')
+subplot(2,1,1)
+plot(f, psd_rI)
+xlabel('Frequency')
+ylabel('PSD of in-phase component')
+grid on
+subplot(2,1,2)
+plot(f, psd_rQ)
+xlabel('Frequency')
+ylabel('PSD of quadrature component')
+grid on
+
+% plotting the frequency responses of the respective channels
+figure
+sgtitle('Frequency response of channel')
+subplot(2,1,1)
+plot(f, H_rI);
+xlabel('Frequeny')
+ylabel('Frequncy response of the in-phase channel')
+grid on
+subplot(2,1,2)
+plot(f, H_rQ)
+xlabel('Frequency')
+ylabel('Frequency response of the quadrature channel')
+grid on
+
+% plotting the impulse responses of the respective channels
+figure
+sgtitle('Impulse response of channel')
+subplot(2,1,1)
+plot(tau, h_rI)
+xlabel('Time')
+ylabel('Impulse response of the in-phase channel')
+grid on
+subplot(2,1,2)
+plot(tau, h_rQ)
+xlabel('Time')
+ylabel('Impulse response of the quadrature component')
+grid on
+
+% plotting the net received in-phase and quadrature signals
+figure
+sgtitle('Received in-phase and quadrature signals')
+subplot(2,1,1)
+plot(tau, received_rI)
+xlabel('Time')
+ylabel('Received in-phase signal')
+grid on
+subplot(2,1,2)
+plot(tau, received_rQ)
+xlabel('Time')
+ylabel('Received quadrature component')
+grid on
+
+% plotting the net received signal
+figure
+sgtitle('Net received signal')
+plot(tau, r)
+xlabel('Time')
+ylabel('Received signal')
+grid on
+##### SOURCE END #####
+--></body></html>
